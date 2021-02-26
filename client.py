@@ -4,7 +4,7 @@ import numpy as np
 
 API_ENDPOINT = 'http://10.4.21.156'
 MAX_DEG = 11
-SECRET_KEY = 'k7jTOWS33pGLD39pgaA5hHIg7IFsG5HqK8iRhjmmNNfCalZ1pQw'
+SECRET_KEY = 'k7jTOWS33pGLD39pgaA5hHIg7IFsG5HqK8iRhmmNNfCalZ1pQw'
 
 def urljoin(root, path=''):
     if path: root = '/'.join([root.rstrip('/'), path.rstrip('/')])
@@ -23,7 +23,6 @@ def send_request(id, vector, path):
 def get_errors(id, vector):
     for i in vector: assert 0<=abs(i)<=10
     assert len(vector) == MAX_DEG
-
     return json.loads(send_request(id, vector, 'geterrors'))
 
 def get_overfit_vector(id):

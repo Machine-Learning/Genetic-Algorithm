@@ -1,12 +1,13 @@
 import numpy
 import re
-# import client
+import client
 
 # Inputs of the equation.
 # equation_inputs = [4,-2,3.5,5,-11,-4.7]
 equation_inputs = []
 
 # open file and read the content in a list
+################## use JSON here ########################
 with open('./overfit.txt','r') as overfit:
     line = overfit.read()
     tmp = re.split(', |\[|\]|\n', line)
@@ -14,25 +15,35 @@ with open('./overfit.txt','r') as overfit:
 for i in tmp:
     if i != '':
         equation_inputs.append(float(i)) 
-"""
-The y=target is to maximize this equation ASAP:
-    y = w1x1+w2x2+w3x3+w4x4+w5x5+6wx6
-    where (x1,x2,x3,x4,x5,x6)=(4,-2,3.5,5,-11,-4.7)
-    What are the best values for the 6 weights w1 to w6?
-    We are going to use the genetic algorithm for the best possible values after a number of generations.
-"""
 
-def cal_pop_fitness(equation_inputs, pop):
+# Number of the weights we are looking to optimize.
+num_weights = 11
+
+"""
+Genetic algorithm parameters:
+    Mating pool size
+    Population size
+"""
+sol_per_pop = 8
+num_parents_mating = 10
+
+# Defining the population size.
+pop_size = (sol_per_pop,num_weights) # The population will have sol_per_pop chromosome where each chromosome has num_weights genes.
+#Creating the initial population.
+new_population = numpy.random.uniform(low=-10.0, high=10.0, size=pop_size)
+print(new_population)
+
+def cal_pop_fitness(equation_inputs):
     # Calculating the fitness value of each solution in the current population.
     # The fitness function caulcuates the sum of products between each input and its corresponding weight.
-    fitness = numpy.sum(pop*equation_inputs, axis=1)
-    return fitness
+    fitness = get_errors(SECRET_KEY, equation_inputs)
+    return fitness["train error"]
 
 def select_mating_pool(pop, fitness, num_parents):
     # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
     parents = numpy.empty((num_parents, pop.shape[1]))
     for parent_num in range(num_parents):
-        max_fitness_idx = numpy.where(fitness == numpy.max(fitness))
+        max_fitness_idx = numpy.where(fitness == numpy.min(fitness))
         max_fitness_idx = max_fitness_idx[0][0]
         parents[parent_num, :] = pop[max_fitness_idx, :]
         fitness[max_fitness_idx] = -99999999999
@@ -62,28 +73,11 @@ def mutation(offspring_crossover):
         offspring_crossover[idx, 4] = offspring_crossover[idx, 4] + random_value
     return offspring_crossover
 
-# Number of the weights we are looking to optimize.
-num_weights = 11
-
-"""
-Genetic algorithm parameters:
-    Mating pool size
-    Population size
-"""
-sol_per_pop = 8
-num_parents_mating = 4
-
-# Defining the population size.
-pop_size = (sol_per_pop,num_weights) # The population will have sol_per_pop chromosome where each chromosome has num_weights genes.
-#Creating the initial population.
-new_population = numpy.random.uniform(low=-4.0, high=4.0, size=pop_size)
-print(new_population)
-
-num_generations = 5
+num_generations = 100/num_parents_mating
 for generation in range(num_generations):
     print("Generation : ", generation)
     # Measing the fitness of each chromosome in the population.
-    fitness = cal_pop_fitness(equation_inputs, new_population)
+    fitness = cal_pop_fitness(equation_inputs)
 
     # Selecting the best parents in the population for mating.
     parents = select_mating_pool(new_population, fitness, 
