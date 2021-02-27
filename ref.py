@@ -4,7 +4,7 @@ import client
 
 # Inputs of the equation.
 # equation_inputs = [4,-2,3.5,5,-11,-4.7]
-equation_inputs = []
+initial_inputs = []
 
 # open file and read the content in a list
 ################## use JSON here ########################
@@ -14,7 +14,7 @@ with open('./overfit.txt','r') as overfit:
   
 for i in tmp:
     if i != '':
-        equation_inputs.append(float(i)) 
+        initial_inputs.append(float(i)) 
 
 # Number of the weights we are looking to optimize.
 num_weights = 11
@@ -24,8 +24,8 @@ Genetic algorithm parameters:
     Mating pool size
     Population size
 """
-sol_per_pop = 8
-num_parents_mating = 10
+sol_per_pop = 10
+num_parents_mating = 2
 
 # Defining the population size.
 pop_size = (sol_per_pop,num_weights) # The population will have sol_per_pop chromosome where each chromosome has num_weights genes.
@@ -33,36 +33,55 @@ pop_size = (sol_per_pop,num_weights) # The population will have sol_per_pop chro
 new_population = numpy.random.uniform(low=-10.0, high=10.0, size=pop_size)
 print(new_population)
 
-def cal_pop_fitness(equation_inputs):
+def cal_pop_fitness(pop):
     # Calculating the fitness value of each solution in the current population.
     # The fitness function caulcuates the sum of products between each input and its corresponding weight.
-    fitness = get_errors(SECRET_KEY, equation_inputs)
-    return fitness["train error"]
+    fitness = []
+    for p in pop:
+        fitness.append(get_errors(SECRET_KEY, p))
+    return fitness
 
-def select_mating_pool(pop, fitness, num_parents):
+def select_parents(pop, fitness):
     # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
-    parents = numpy.empty((num_parents, pop.shape[1]))
-    for parent_num in range(num_parents):
-        max_fitness_idx = numpy.where(fitness == numpy.min(fitness))
-        max_fitness_idx = max_fitness_idx[0][0]
-        parents[parent_num, :] = pop[max_fitness_idx, :]
-        fitness[max_fitness_idx] = -99999999999
+    # dividing fitness values into probability ranges
+    total = 0
+    for e in fitness:
+        total = total + e[0]
+    roulette = [0]
+    val = 0
+    for e in fitness:
+        # cumulative sum of fitness
+        val = val + e[0]
+        roulette.append(val/total)
+    
+    # selecting parents according to value of a random number
+    parents = numpy.empty(pop.shape)
+    for p in parents:
+        num = numpy.random.uniform(0,1)
+        id = 1
+        while (roulette[id] - num) > 1e-20:
+            id = id + 1
+        p = pop[id-1]
     return parents
 
-def crossover(parents, offspring_size):
-    offspring = numpy.empty(offspring_size)
-    # The point at which crossover takes place between two parents. Usually it is at the center.
-    crossover_point = numpy.uint8(offspring_size[1]/2)
-
-    for k in range(offspring_size[0]):
-        # Index of the first parent to mate.
-        parent1_idx = k%parents.shape[0]
-        # Index of the second parent to mate.
-        parent2_idx = (k+1)%parents.shape[0]
-        # The new offspring will have its first half of its genes taken from the first parent.
-        offspring[k, 0:crossover_point] = parents[parent1_idx, 0:crossover_point]
-        # The new offspring will have its second half of its genes taken from the second parent.
-        offspring[k, crossover_point:] = parents[parent2_idx, crossover_point:]
+def crossover(parents, num_parents_mating,fitness):
+    offspring = numpy.empty(parents.shape)
+    # Whole Arithmetic Recombination cross-over
+    i = 0
+    while i < offspring.shape[0]:
+        total = 0
+        for idx in range(i, i+num_parents_mating):
+            total = total + fitness[idx][0]
+        coeff = []
+        for idx in range(i, i+num_parents_mating):
+            coeff.append(fitness[idx][0]/total)
+        
+        for idx in range(i, i+num_parents_mating):
+            offspring[idx] = 0.0
+            for c in coeff:
+                offspring[idx] = c*
+    
+    
     return offspring
 
 def mutation(offspring_crossover):
@@ -73,19 +92,19 @@ def mutation(offspring_crossover):
         offspring_crossover[idx, 4] = offspring_crossover[idx, 4] + random_value
     return offspring_crossover
 
-num_generations = 100/num_parents_mating
+num_generations = 100//sol_per_pop
 for generation in range(num_generations):
     print("Generation : ", generation)
     # Measing the fitness of each chromosome in the population.
-    fitness = cal_pop_fitness(equation_inputs)
+    fitness = cal_pop_fitness(new_population)
 
     # Selecting the best parents in the population for mating.
-    parents = select_mating_pool(new_population, fitness, 
-                                      num_parents_mating)
+    parents = select_parents(new_population, fitness)
 
     # Generating next generation using crossover.
-    offspring_crossover = crossover(parents,
-                                       offspring_size=(pop_size[0]-parents.shape[0], num_weights))
+    # offspring_crossover = crossover(parents,
+    #                                    offspring_size=(pop_size[0]-parents.shape[0], num_weights))
+    offspring_crossover = crossover(parents,num_parents_mating,fitness)
 
     # Adding some variations to the offsrping using mutation.
     offspring_mutation = mutation(offspring_crossover)
@@ -105,8 +124,3 @@ best_match_idx = numpy.where(fitness == numpy.max(fitness))
 
 print("Best solution : ", new_population[best_match_idx, :])
 print("Best solution fitness : ", fitness[best_match_idx])
-
-# This project is extended and a library called PyGAD is released to build the genetic algorithm.
-# PyGAD documentation: https://pygad.readthedocs.io
-# Install PyGAD: pip install pygad
-# PyGAD source code at GitHub: https://github.com/ahmedfgad/GeneticAlgorithmPython
