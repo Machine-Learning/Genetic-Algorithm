@@ -133,6 +133,7 @@ for generation in range(num_generations):
     # offspring_crossover = crossover(parents,
     #                                    offspring_size=(pop_size[0]-parents.shape[0], num_weights))
     offspring_crossover = crossover(parents,num_parents_mating,fitness)
+    print("offspring_crossover : ",offspring_crossover)
 
     # Adding some variations to the offsrping using mutation.
     offspring_mutation = mutation(offspring_crossover)
