@@ -51,8 +51,8 @@ def cal_pop_fitness(pop):
     i = 1
     for p in pop:
         # print('Vector: ',list(p))
-        fitness.append(get_errors(SECRET_KEY, list(p)))
-        # fitness.append((i,i))
+        # fitness.append(get_errors(SECRET_KEY, list(p)))
+        fitness.append((i,i))
     return fitness
 
 def select_parents(pop, fitness):
@@ -69,13 +69,17 @@ def select_parents(pop, fitness):
         roulette.append(val/total)
     
     # selecting parents according to value of a random number
-    parents = numpy.empty(pop.shape)
+    # print("select_parents's pop ",pop)
+    # parents = numpy.empty(pop.shape)
+    parents = pop
+    # print("parents1 : ",parents)
     for p in parents:
         num = numpy.random.uniform(0,1)
         id = 1
         while id < len(roulette) and (roulette[id] - num) < 1e-20:
             id = id + 1
         p = pop[id-1]
+    # print("parents2 : ",parents)
     return parents
 
 def crossover(parents, num_parents_mating,fitness):
