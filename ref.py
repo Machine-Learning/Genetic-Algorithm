@@ -1,6 +1,7 @@
 import numpy
 import re
 import client
+import math
 
 # Inputs of the equation.
 # equation_inputs = [4,-2,3.5,5,-11,-4.7]
@@ -80,7 +81,9 @@ def crossover(parents, num_parents_mating,fitness):
             offspring[idx] = 0.0
             for c in coeff:
                 offspring[idx] = c*
+                #NOTE Check this line 'c*' 
     
+
     
     return offspring
 
@@ -89,7 +92,12 @@ def mutation(offspring_crossover):
     for idx in range(offspring_crossover.shape[0]):
         # The random value to be added to the gene.
         random_value = numpy.random.uniform(-1.0, 1.0, 1)
-        offspring_crossover[idx, 4] = offspring_crossover[idx, 4] + random_value
+        if(random_value > -0.3 and random_value < 0.3 ): # question do we have to do mutation for every generation
+            flag1 = math.ceil(numpy.random.uniform(0,11))
+            flag2 = math.ceil(numpy.random.uniform(0,11))
+            temp  = offspring_crossover[idx, flag1]
+            offspring_crossover[idx, flag1] = offspring_crossover[idx, flag2]
+            offspring_crossover[idx, flag2] = temp 
     return offspring_crossover
 
 num_generations = 100//sol_per_pop
@@ -105,6 +113,7 @@ for generation in range(num_generations):
     # offspring_crossover = crossover(parents,
     #                                    offspring_size=(pop_size[0]-parents.shape[0], num_weights))
     offspring_crossover = crossover(parents,num_parents_mating,fitness)
+    print("offspring_crossover : ",offspring_crossover)
 
     # Adding some variations to the offsrping using mutation.
     offspring_mutation = mutation(offspring_crossover)
