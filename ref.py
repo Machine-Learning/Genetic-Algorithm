@@ -6,17 +6,6 @@ from client import *
 
 # Inputs of the equation.
 # equation_inputs = [4,-2,3.5,5,-11,-4.7]
-initial_inputs = []
-
-# open file and read the content in a list
-################## use JSON here ########################
-with open('./overfit.txt','r') as overfit:
-    line = overfit.read()
-    tmp = re.split(', |\[|\]|\n', line)
-  
-for i in tmp:
-    if i != '':
-        initial_inputs.append(float(i)) 
 
 # Number of the weights we are looking to optimize.
 num_weights = 11
@@ -38,8 +27,34 @@ try:
         data = list(old_generation)
         new_population = numpy.array(data)
 except:
-    #Creating the initial population.
-    new_population = numpy.random.uniform(low=-10.0, high=10.0, size=pop_size)
+    initial_inputs = []
+    # print('Going to except******************************')
+    # open file and read the content in a list
+    try:
+        with open('./overfit.txt','r') as overfit:
+            line = overfit.read()
+            tmp = re.split(', |\[|\]|\n', line)
+        for i in tmp:
+            if i != '':
+                initial_inputs.append(float(i))
+        # print(initial_inputs,'**********')
+                
+        new_population = []
+        # new_population = numpy.random.uniform(low=-10.0, high=10.0, size=pop_size)
+        rng = 1.0
+        for i in range(sol_per_pop):
+            ls = []
+            for vec in initial_inputs:
+                num = numpy.random.uniform(-rng,rng)
+                num = vec*(1.01+num)
+                ls.append(num)
+            new_population.append(ls)
+        new_population = numpy.array(new_population)
+        # print(new_population,' type:  ',type(new_population))
+        
+    except:
+        #Creating the initial population.
+        new_population = numpy.random.uniform(low=-10.0, high=10.0, size=pop_size)
     
 
 # print(new_population)
@@ -51,8 +66,8 @@ def cal_pop_fitness(pop):
     i = 1
     for p in pop:
         # print('Vector: ',list(p))
-        # fitness.append(get_errors(SECRET_KEY, list(p)))
-        fitness.append((i,i))
+        fitness.append(get_errors(SECRET_KEY, list(p)))
+        # fitness.append((i,i))
     return fitness
 
 def select_parents(pop, fitness):
@@ -86,6 +101,7 @@ def crossover(parents, num_parents_mating,fitness):
     offspring = numpy.empty(parents.shape)
     n = offspring.shape[0]
     i = 0
+    # uses Whole Arithmatic Recombination
     while i < n:
         total = 0
         for idx in range(i, i+num_parents_mating):
@@ -109,15 +125,17 @@ def mutation(offspring_crossover):
     for idx in range(offspring_crossover.shape[0]):
         # The random value to be added to the gene.
         random_value = numpy.random.uniform(-1.0, 1.0, 1)
-        if(random_value > -0.3 and random_value < 0.3 ): # question do we have to do mutation for every generation
-            flag2 = numpy.random.randint(0,10)
+        if(random_value > -0.4 and random_value < 0.4 ): # question do we have to do mutation for every generation
+            # flag2 = numpy.random.randint(0,10)
             flag1 = numpy.random.randint(0,10)
-            temp  = offspring_crossover[idx, flag1]
-            offspring_crossover[idx, flag1] = offspring_crossover[idx, flag2]
-            offspring_crossover[idx, flag2] = temp 
+            mut = numpy.random.uniform(-0.1,0.1)
+            offspring_crossover[idx, flag1] = offspring_crossover[idx, flag1]*(1+mut)
+            # temp  = offspring_crossover[idx, flag1]
+            # offspring_crossover[idx, flag1] = offspring_crossover[idx, flag2]
+            # offspring_crossover[idx, flag2] = temp 
     return offspring_crossover
 
-num_generations = 50//sol_per_pop
+num_generations = 20//sol_per_pop
 for generation in range(num_generations):
     print("Generation : ", generation)
     # Measing the fitness of each chromosome in the population.
