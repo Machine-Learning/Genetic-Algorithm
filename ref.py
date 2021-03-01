@@ -23,9 +23,11 @@ pop_size = (sol_per_pop,num_weights) # The population will have sol_per_pop chro
 
 try:
     with open('./output.txt','r') as prev:
-        old_generation = json.loads(prev)
+        old_generation = json.load(prev)
+        old_generation = json.loads(old_generation)
         data = list(old_generation)
         new_population = numpy.array(data)
+    # print("inside try 1 ")
 except:
     initial_inputs = []
     # print('Going to except******************************')
@@ -34,6 +36,7 @@ except:
         with open('./overfit.txt','r') as overfit:
             line = overfit.read()
             tmp = re.split(', |\[|\]|\n', line)
+        # print("Inside try 2")
         for i in tmp:
             if i != '':
                 initial_inputs.append(float(i))
@@ -54,6 +57,7 @@ except:
         
     except:
         #Creating the initial population.
+        # print("inside last except ")
         new_population = numpy.random.uniform(low=-10.0, high=10.0, size=pop_size)
     
 
@@ -135,7 +139,7 @@ def mutation(offspring_crossover):
             # offspring_crossover[idx, flag2] = temp 
     return offspring_crossover
 
-num_generations = 20//sol_per_pop
+num_generations = 50//sol_per_pop
 for generation in range(num_generations):
     print("Generation : ", generation)
     # Measing the fitness of each chromosome in the population.

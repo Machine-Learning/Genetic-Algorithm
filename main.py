@@ -9,10 +9,16 @@ equation_inputs = []
 
 # open file and read the content in a list
 ################## use JSON here ########################
-with open('./overfit.txt','r') as overfit:
-    line = overfit.read()
-    tmp = re.split(', |\[|\]|\n', line)
-  
+with open('./output.txt','r') as prev:
+    old_generation = json.load(prev)
+    old_generation = json.loads(old_generation)
+    data = list(old_generation)
+    equation_inputs = numpy.array(data)
+    print("inside try 1 ")
+# except:
+# print("not in try")
+print(equation_inputs)
+exit()
 for i in tmp:
     if i != '':
         equation_inputs.append(float(i)) 
