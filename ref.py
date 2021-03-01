@@ -72,6 +72,10 @@ def cal_pop_fitness(pop):
         # print('Vector: ',list(p))
         fitness.append(get_errors(SECRET_KEY, list(p)))
         # fitness.append((i,i))
+    for f in fitness:
+        f[0] = "{:e}".format(f[0])
+        f[1] = "{:e}".format(f[1])
+
     return fitness
 
 def select_parents(pop, fitness):
