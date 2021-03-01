@@ -17,6 +17,8 @@ Genetic algorithm parameters:
 """
 sol_per_pop = 10
 num_parents_mating = 2
+const_addition = 1e-18
+total_api_calls = 50
 
 # Defining the population size.
 pop_size = (sol_per_pop,num_weights) # The population will have sol_per_pop chromosome where each chromosome has num_weights genes.
@@ -50,6 +52,8 @@ except:
             for vec in initial_inputs:
                 num = numpy.random.uniform(-rng,rng)
                 num = vec*(1.01+num)
+                if(not num):
+                    num += const_addition
                 ls.append(num)
             new_population.append(ls)
         new_population = numpy.array(new_population)
@@ -71,10 +75,7 @@ def cal_pop_fitness(pop):
     for p in pop:
         # print('Vector: ',list(p))
         fitness.append(get_errors(SECRET_KEY, list(p)))
-        # fitness.append((i,i))
-    for f in fitness:
-        f[0] = "{:e}".format(f[0])
-        f[1] = "{:e}".format(f[1])
+        # fitness.append([i,i])
 
     return fitness
 
@@ -143,13 +144,17 @@ def mutation(offspring_crossover):
             # offspring_crossover[idx, flag2] = temp 
     return offspring_crossover
 
-num_generations = 50//sol_per_pop
+num_generations = total_api_calls//sol_per_pop
 for generation in range(num_generations):
     print("Generation : ", generation)
     # Measing the fitness of each chromosome in the population.
     print('New population: ',new_population,end='\n')
     fitness = cal_pop_fitness(new_population)
-    print('Fitness: ',fitness,end='\n\n')
+    var_fitness = [[fitness[x][y] for y in range(len(fitness[0]))] for x in range(len(fitness))]
+    for f in var_fitness:
+        f[0] = "{:e}".format(f[0])
+        f[1] = "{:e}".format(f[1])
+    print('Fitness: ',var_fitness,end='\n\n')
 
     # Selecting the best parents in the population for mating.
     parents = select_parents(new_population, fitness)
