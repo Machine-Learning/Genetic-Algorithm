@@ -51,8 +51,8 @@ def cal_pop_fitness(pop):
     i = 1
     for p in pop:
         # print('Vector: ',list(p))
-        fitness.append(get_errors(SECRET_KEY, list(p)))
-        # fitness.append((i,i))
+        # fitness.append(get_errors(SECRET_KEY, list(p)))
+        fitness.append((i,i))
     return fitness
 
 def select_parents(pop, fitness):
@@ -80,28 +80,23 @@ def select_parents(pop, fitness):
 
 def crossover(parents, num_parents_mating,fitness):
     offspring = numpy.empty(parents.shape)
-    cross_id = numpy.random.randint(0,offspring.shape[1])
-    # Whole Arithmetic Recombination cross-over
+    n = offspring.shape[0]
     i = 0
-    while i < offspring.shape[0]:
-        for j in range(0,cross_id):
-            offspring[i][j] = parents[i][j]
-            offspring[i+1][j] = parents[i+1][j]
-        for j in range(cross_id,offspring.shape[1]):
-            offspring[i][j] = parents[i+1][j]
-            offspring[i+1][j] = parents[i][j]
-        i = i+2
-        # total = 0
-        # for idx in range(i, i+num_parents_mating):
-        #     total = total + fitness[idx][0]
-        # coeff = []
-        # for idx in range(i, i+num_parents_mating):
-        #     coeff.append(fitness[idx][0]/total)
+    while i < n:
+        total = 0
+        for idx in range(i, i+num_parents_mating):
+            total = total + fitness[idx][0]
+        coeff = []
+        for idx in range(i, i+num_parents_mating):
+            coeff.append(fitness[idx][0]/total)
         
-        # for idx in range(i, i+num_parents_mating):
-        #     offspring[idx] = 0.0
-        #     for c in coeff:
-        #         offspring[idx] = c*
+        for idx in range(i, i+num_parents_mating):
+            for j in range(0,offspring.shape[1]):
+                offspring[idx][j] = 0.0
+                for c in range(0,len(coeff)):
+                    offspring[idx][j] = offspring[idx][j] + coeff[c]*parents[(idx+c)%n][j]
+                
+        i = i + num_parents_mating
     
     return offspring
 
