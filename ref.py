@@ -17,9 +17,9 @@ Genetic algorithm parameters:
 """
 sol_per_pop = 10
 num_parents_mating = 2
-const_addition = 1e-18
 total_api_calls = 50
 train_data_wieght = 0.4
+p = 0.8
 
 # Defining the population size.
 pop_size = (sol_per_pop,num_weights) # The population will have sol_per_pop chromosome where each chromosome has num_weights genes.
@@ -47,8 +47,10 @@ except:
                 
         new_population = []
         # new_population = numpy.random.uniform(low=-10.0, high=10.0, size=pop_size)
-        rng = 1.0
-        for i in range(sol_per_pop):
+        new_population.append(initial_inputs)
+        rng = 0.25
+        const_addition = min(initial_inputs)
+        for i in range(sol_per_pop-1):
             ls = []
             for vec in initial_inputs:
                 num = numpy.random.uniform(-rng,rng)
@@ -67,6 +69,14 @@ except:
     
 
 # print(new_population)
+
+def fitness_function(fitness):
+    power = 5
+    if fitness[0][0]>=1:
+        power = 1/power
+    for e in fitness:
+        e[0] = 1/(train_data_wieght*math.pow(e[0],power) + (1-train_data_wieght)*math.pow(e[1],power))
+    return fitness
 
 def cal_pop_fitness(pop):
     # Calculating the fitness value of each solution in the current population.
@@ -113,18 +123,17 @@ def crossover(parents, num_parents_mating,fitness):
     i = 0
     # uses Whole Arithmatic Recombination
     while i < n:
-        total = 0
-        for idx in range(i, i+num_parents_mating):
-            total = total + fitness[idx][0]
+        prob = p
         coeff = []
         for idx in range(i, i+num_parents_mating):
-            coeff.append(fitness[idx][0]/total)
+            coeff.append(prob)
+            prob *= (1-p)
         
         for idx in range(i, i+num_parents_mating):
             for j in range(0,offspring.shape[1]):
                 offspring[idx][j] = 0.0
                 for c in range(0,len(coeff)):
-                    offspring[idx][j] = offspring[idx][j] + coeff[c]*parents[(idx+c)%n][j]
+                    offspring[idx][j] = offspring[idx][j] + coeff[c]*parents[(idx+c)%num_parents_mating][j]
                 
         i = i + num_parents_mating
     
@@ -158,8 +167,7 @@ for generation in range(num_generations):
     print('Fitness: ',var_fitness,end='\n\n')
 
     # average fitness
-    for e in fitness:
-        e[0] = (train_data_wieght*e[0] + (1-train_data_wieght)*e[1])
+    fitness = fitness_function(fitness)
     # Selecting the best parents in the population for mating.
     parents = select_parents(new_population, fitness)
 
