@@ -19,6 +19,7 @@ sol_per_pop = 10
 num_parents_mating = 2
 const_addition = 1e-18
 total_api_calls = 50
+train_data_wieght = 0.4
 
 # Defining the population size.
 pop_size = (sol_per_pop,num_weights) # The population will have sol_per_pop chromosome where each chromosome has num_weights genes.
@@ -156,6 +157,9 @@ for generation in range(num_generations):
         f[1] = "{:e}".format(f[1])
     print('Fitness: ',var_fitness,end='\n\n')
 
+    # average fitness
+    for e in fitness:
+        e[0] = (train_data_wieght*e[0] + (1-train_data_wieght)*e[1])
     # Selecting the best parents in the population for mating.
     parents = select_parents(new_population, fitness)
 
@@ -163,7 +167,7 @@ for generation in range(num_generations):
     # offspring_crossover = crossover(parents,
     #                                    offspring_size=(pop_size[0]-parents.shape[0], num_weights))
     offspring_crossover = crossover(parents,num_parents_mating,fitness)
-    print("offspring_crossover : ",offspring_crossover)
+    # print("offspring_crossover : ",offspring_crossover)
 
     # Adding some variations to the offsrping using mutation.
     offspring_mutation = mutation(offspring_crossover)
