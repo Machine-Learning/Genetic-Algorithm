@@ -2,6 +2,7 @@ import numpy
 import re
 import json
 import math
+import random
 from client import *
 
 # Inputs of the equation.
@@ -17,7 +18,7 @@ Genetic algorithm parameters:
 """
 sol_per_pop = 10
 num_parents_mating = 2
-total_api_calls = 100
+total_api_calls = 140
 train_data_wieght = 0.4
 p = 0.8
 
@@ -115,15 +116,16 @@ def select_parents(pop, fitness):
     # selecting parents according to value of a random number
     # print("select_parents's pop ",pop)
     # parents = numpy.empty(pop.shape)
-    parents = pop
+    parents = []
     # print("parents1 : ",parents)
-    for p in parents:
+    for p in pop:
         num = numpy.random.uniform(0,1)
         id = 1
         while id < len(roulette) and (roulette[id] - num) < 1e-20:
             id = id + 1
-        p = pop[id-1]
-    # print("parents2 : ",parents)
+        val = pop[id-1]
+        parents.append(val)
+    parents = numpy.array(parents)
     return parents
 
 def crossover(parents, num_parents_mating,fitness):
@@ -137,13 +139,14 @@ def crossover(parents, num_parents_mating,fitness):
         # for idx in range(i, i+num_parents_mating):
         #     coeff.append(prob)
         #     prob *= (1-p)
-        
+            # for j in range(0,offspring.shape[1]):
+        num = random.sample(range(1,offspring.shape[1]),num_parents_mating-1)
+        num.sort()
+        num.append(offspring.shape[1])
         for idx in range(i, i+num_parents_mating):
-            for j in range(0,offspring.shape[1]):
-                num = numpy.random.randint(0,num_parents_mating-1)
-                offspring[idx][j] = parents[(idx+num)%num_parents_mating][j]
-                # for c in range(0,len(coeff)):
-                #     offspring[idx][j] = offspring[idx][j] + coeff[c]*parents[(idx+c)%num_parents_mating][j]
+            offspring[idx][0:num[0]] = parents[idx][0:num[0]]
+            for k in range(0,len(num)-1):
+                offspring[idx][num[k]:num[k+1]] = parents[i+(idx+k+1)%num_parents_mating][num[k]:num[k+1]]
                 
         i = i + num_parents_mating
     
@@ -153,12 +156,14 @@ def mutation(offspring_crossover):
     # Mutation changes a single gene in each offspring randomly.
     for idx in range(offspring_crossover.shape[0]):
         # The random value to be added to the gene.
-        random_value = numpy.random.uniform(-1.0, 1.0, 1)
-        if(random_value > -0.4 and random_value < 0.4 ): # question do we have to do mutation for every generation
-            # flag2 = numpy.random.randint(0,10)
-            flag1 = numpy.random.randint(0,10)
-            mut = numpy.random.uniform(-0.1,0.1)
-            offspring_crossover[idx, flag1] = offspring_crossover[idx, flag1]*(1+mut)
+        for j in range(offspring_crossover.shape[1]):
+            random_value = numpy.random.uniform(-1.0, 1.0, 1)
+            if(random_value > -0.2 and random_value < 0.2 ): # question do we have to do mutation for every generation
+                # flag2 = numpy.random.randint(0,10)
+                # flag1 = numpy.random.randint(0,10)
+                mut = numpy.random.uniform(0.05,0.15)
+                s = numpy.random.choice([-1,1])
+                offspring_crossover[idx, j] = offspring_crossover[idx, j]*(1+s*mut)
             # temp  = offspring_crossover[idx, flag1]
             # offspring_crossover[idx, flag1] = offspring_crossover[idx, flag2]
             # offspring_crossover[idx, flag2] = temp 
@@ -182,8 +187,6 @@ for generation in range(num_generations):
     parents = select_parents(new_population, fitness)
 
     # Generating next generation using crossover.
-    # offspring_crossover = crossover(parents,
-    #                                    offspring_size=(pop_size[0]-parents.shape[0], num_weights))
     offspring_crossover = crossover(parents,num_parents_mating,fitness)
     # print("offspring_crossover : ",offspring_crossover)
 
