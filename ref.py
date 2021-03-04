@@ -8,7 +8,7 @@ from client import *
 num_weights = 11
 sol_per_pop = 10
 num_parents_mating = 2
-total_api_calls = 140
+total_api_calls = 20
 train_data_wieght = 0.4
 p = 0.8
 pop_size = (sol_per_pop,num_weights) 
@@ -23,22 +23,23 @@ except:
     initial_inputs = []
     try:
         with open('./overfit.txt','r') as overfit:
-            line = overfit.read()
-            tmp = re.split(', |\[|\]|\n', line)
+            # line = overfit.read()
+            # tmp = re.split(', |\[|\]|\n', line)
+            tmp = json.load(overfit)
         for i in tmp:
             if i != '':
                 initial_inputs.append(float(i))
         new_population = []
         new_population.append(initial_inputs)
-        rng = 0.25
-        const_addition = min(initial_inputs)
+        rng = 0.1
+        const_addition = min(initial_inputs) # do we need this now
         for i in range(sol_per_pop-1):
             ls = []
             for vec in initial_inputs:
                 num = numpy.random.uniform(-rng,rng)
                 num = vec*(1.01+num)
-                if(not num):
-                    num += const_addition
+                # if(not num):
+                #     num += const_addition         # and these also no need 
                 ls.append(num)
             new_population.append(ls)
         new_population = numpy.array(new_population)
@@ -64,7 +65,7 @@ def select_parents(pop, fitness):
         total = total + e[0]
     percent = []
     for e in fitness:
-        percent.append(1 - e[0]/total)
+        percent.append(1 - e[0]/total)   # change here
     total = 0
     for e in percent:
         total = total + e
@@ -75,7 +76,7 @@ def select_parents(pop, fitness):
         roulette.append(val/total)
     parents = []
     for p in pop:
-        num = numpy.random.uniform(0,1)
+        num = numpy.random.uniform(0,9) # changed here  1 -> 9 (changed to 9)
         id = 1
         while id < len(roulette) and (roulette[id] - num) < 1e-20:
             id = id + 1
@@ -91,7 +92,7 @@ def crossover(parents, num_parents_mating,fitness):
     while i < n:
         num = random.sample(range(1,offspring.shape[1]),num_parents_mating-1)
         num.sort()
-        num.append(offspring.shape[1])
+        num.append(offspring.shape[1]) # [5,11] parent - [a,b,c,d]
         for idx in range(i, i+num_parents_mating):
             offspring[idx][0:num[0]] = parents[idx][0:num[0]]
             for k in range(0,len(num)-1):
