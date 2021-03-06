@@ -7,7 +7,7 @@ from client import *
 num_weights = 11
 sol_per_pop = 10
 num_parents_mating = 2
-total_api_calls = 50
+total_api_calls = 400
 train_data_wieght = 0.4
 p = 0.8
 pop_size = (sol_per_pop,num_weights) 
@@ -62,7 +62,7 @@ def select_parents(pop, fitness):
         total = total + e[0]
     percent = []
     for e in fitness:
-        percent.append(1 - e[0]/total)
+        percent.append(total/e[0])
     total = 0
     for e in percent:
         total = total + e
@@ -101,8 +101,8 @@ def mutation(offspring_crossover):
     for idx in range(offspring_crossover.shape[0]):
         for j in range(offspring_crossover.shape[1]):
             random_value = numpy.random.uniform(-1.0, 1.0, 1)
-            if(random_value > -0.2 and random_value < 0.2 ): 
-                mut = numpy.random.uniform(-0.25,0.25)
+            if(random_value > -0.35 and random_value < 0.35 ): 
+                mut = numpy.random.uniform(-0.2,0.2)
                 s = numpy.random.choice([-1,1])
                 offspring_crossover[idx, j] = offspring_crossover[idx, j]*(1+s*mut)
     return offspring_crossover
