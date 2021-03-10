@@ -7,7 +7,7 @@ from client import *
 num_weights = 11
 sol_per_pop = 10
 num_parents_mating = 2
-total_api_calls = 580
+total_api_calls = 800
 train_data_wieght = 0.4
 p = 0.8
 pop_size = (sol_per_pop,num_weights) 
@@ -62,7 +62,7 @@ def select_parents(pop, fitness):
         total = total + e[0]
     percent = []
     for e in fitness:
-        percent.append(total/e[0])
+        percent.append(math.pow(total/e[0],0.85))
     total = 0
     for e in percent:
         total = total + e
@@ -101,8 +101,8 @@ def mutation(offspring_crossover):
     for idx in range(offspring_crossover.shape[0]):
         for j in range(offspring_crossover.shape[1]):
             random_value = numpy.random.uniform(-1.0, 1.0, 1)
-            if(random_value > -0.2 and random_value < 0.2 ): 
-                mut = numpy.random.uniform(-0.25,0.25)
+            if(random_value > -0.3 and random_value < 0.3 ): 
+                mut = numpy.random.uniform(-0.3,0.3)
                 s = numpy.random.choice([-1,1])
                 offspring_crossover[idx, j] = offspring_crossover[idx, j]*(1+s*mut)
     return offspring_crossover
@@ -110,7 +110,7 @@ def mutation(offspring_crossover):
 num_generations = total_api_calls//sol_per_pop
 for generation in range(num_generations):
     print("Generation : ", generation)
-    print('New population: ',new_population,end='\n')
+    print('New population: ',list(new_population),end='\n')
     fitness = cal_pop_fitness(new_population)
     var_fitness = [[fitness[x][y] for y in range(len(fitness[0]))] for x in range(len(fitness))]
     for f in var_fitness:
