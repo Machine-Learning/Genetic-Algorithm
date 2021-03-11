@@ -7,7 +7,7 @@ from client import *
 num_weights = 11
 sol_per_pop = 10
 num_parents_mating = 2
-total_api_calls = 800
+total_api_calls = 70
 train_data_wieght = 0.4
 p = 0.8
 pop_size = (sol_per_pop,num_weights) 
