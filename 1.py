@@ -1,5 +1,9 @@
 from testpy import *
+from abcdef import *
+from client import *
+
 arr = []
+
 for i in range(0,len(val)):
     for j in range(0,len(val[0])):
         temp_val1 = val[i][j][0] + val[i][j][1]
@@ -10,6 +14,52 @@ for i in range(0,len(val)):
             arr.append((temp_val1,temp_val2,temp_val3,temp_val4))
         
 arr.sort()
-
-for i in arr :
-    print(i)
+# print("> What you  want to Do : ")
+# print("> if you want to print values markdown format file press 0 ")
+# print("> if you want to print value in a txt format press 1")
+# print("> If you want to submit value online press 2 (in increasing order of Total Error")
+val = 2             # change this value as required 
+if(val == 0):
+    print("### Some Lowest Values :")   
+    j = 1
+    for i in arr :
+        print("> " + "" + str(j) + ".")
+        print("> " + str(i))
+        temp_val = []
+        j+=1
+        if(int(i[1][0])>=80):
+            print("```\n" + str(generations[i[1][0]-81][i[1][1]]) + "\n```\n")
+        else:
+            print("Find Generation in 1.out as Generation < 80 ")
+elif(val == 1):
+    for i in arr:
+        print("> " + str(i))
+        if(int(i[1][0])>=80):
+            print(generations[i[1][0]-81][i[1][1]])
+        else:
+            print("Find Generation in 1.out as Generation < 80 ")
+elif(val == 2):
+    print("Entering submition Zone!")
+    print("Enter 1 to submit nest value")
+    i=0
+    while i < len(arr):
+        print("---------------------------------------------------------------------------------------------------------------------------")
+        print(arr[i])
+        if(int(arr[i][1][0])>=80):
+            print("population vector : " + str(generations[arr[i][1][0]-81][arr[i][1][1]]))
+        else:
+            print("Find Generation in 1.out as Generation < 80 ")
+            break
+        temp = input("Wanna Submit this value : ")
+        print("temp : ",temp)
+        if(int(temp) == 1):
+            print("This value is submitted")
+            print(submit(SECRET_KEY,generations[arr[i][1][0]-81][arr[i][1][1]]))
+        elif(int(temp) == 2):
+            print("This value is skipped")
+        else:
+            print("Wrong Input")
+            i=i-1
+        i+=1
+else:
+    print("Enter correct value")
