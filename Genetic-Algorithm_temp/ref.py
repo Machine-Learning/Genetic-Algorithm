@@ -7,7 +7,7 @@ from client import *
 num_weights = 11
 sol_per_pop = 10
 num_parents_mating = 2
-total_api_calls = 480
+total_api_calls = 200
 train_data_wieght = 0.4
 p = 0.8
 pop_size = (sol_per_pop,num_weights) 
@@ -121,7 +121,7 @@ for generation in range(num_generations):
     for f in var_fitness:
         f[0] = "{:e}".format(f[0])
         f[1] = "{:e}".format(f[1])
-    # print('Errors: ',var_fitness,end='\n\n')
+    print('Errors: ',var_fitness,end='\n\n')
     fitness = fitness_function(fitness)
     parents = select_parents(new_population, fitness)
     print("Selection : ",list(parents))
