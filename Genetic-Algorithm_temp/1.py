@@ -23,7 +23,7 @@ arr.sort()
 # print("> if you want to print values markdown format file press 0 ")
 # print("> if you want to print value in a txt format press 1")
 # print("> If you want to submit value online press 2 (in increasing order of Total Error")
-val = 1            # change this value as required 
+val = 2            # change this value as required 
 if(val == 0):
     print("### Some Lowest Values :")   
     j = 1

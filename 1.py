@@ -15,7 +15,7 @@ for i in range(0,len(val)):
         temp_val2 = (i+1,j)
         temp_val3 = ("{:e}".format(val[i][j][0]), "{:e}".format(val[i][j][1]))
         temp_val4 = "line : " +  str(i*33 +j*3 + 2)
-        if(val[i][j][0] <= 1.0e11 and val[i][j][1] <= 1.0e11):
+        if(val[i][j][0] >= 1.0e11 and val[i][j][0] <= 5.0e11 and val[i][j][1] >= 1.0e11 and val[i][j][1] <= 5.0e11):
             arr.append((temp_val1,temp_val2,temp_val3,temp_val4))
         
 arr.sort()
